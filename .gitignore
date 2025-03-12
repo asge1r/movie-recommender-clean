@@ -1,0 +1,4 @@
+data/processed_reviews.csv
+node_modules/
+.env
+.DS_Store
