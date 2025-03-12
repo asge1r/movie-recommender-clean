@@ -1,4 +1,17 @@
-data/processed_reviews.csv
+# Node.js dependencies
 node_modules/
+
+# Environment variables
 .env
-.DS_Store
+
+# Logs
+*.log
+
+# User data
+data/users.json
+
+# Large data files (if needed)
+# data/large_files/
+
+# OS files
+.DS_Storedata/processed_reviews.csv
