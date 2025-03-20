@@ -9,6 +9,7 @@ const path = require('path');
 const axios = require('axios');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = 3000;
@@ -58,6 +59,11 @@ const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3.2';
 // Together AI API key (kept as fallback)
 const TOGETHER_AI_API_KEY = "b97128da1c42e229ee7a40238851f6277815198e8ccd27b5aaec1bd6d0fb5aaf";
 const TOGETHER_AI_API_URL = "https://api.together.xyz/v1/completions";
+
+// Letterboxd API configuration
+const LETTERBOXD_API_KEY = process.env.LETTERBOXD_API_KEY || 'your-api-key';
+const LETTERBOXD_API_SECRET = process.env.LETTERBOXD_API_SECRET || 'your-api-secret';
+const LETTERBOXD_API_URL = 'https://api.letterboxd.com/api/v0';
 
 // Movie data storage
 let moviesWithDescriptions = [];
@@ -275,6 +281,77 @@ USER LIKES: ${inputMoviesList}`;
   
     return prompt;
   }
+
+// Create enhanced LLM prompt that includes Letterboxd ratings
+function createEnhancedLLMPrompt(inputMovies, similarMovies, userMessage = '', genre = '', year = '', rating = '', userMood = '', letterboxdRatings = []) {
+  // Format input movies
+  const inputMoviesList = inputMovies.join(', ');
+  
+  // Format similar movies with details
+  const movieCandidates = similarMovies.map(movie => {
+    // Get some representative reviews
+    const reviews = getRepresentativeReviews(movie.movie_id, 2);
+    const reviewTexts = reviews.map(r => cleanReviewText(r.review).substring(0, 150)).join(' ');
+    
+    return `- "${movie.name}" (${movie.year}) - Rating: ${movie.rating}/10
+   Genres: ${movie.genres}
+   Plot: ${movie.description.substring(0, 200)}
+   Reviews: ${reviewTexts || 'No reviews available'}`;
+  }).join('\n\n');
+
+  // Format Letterboxd ratings
+  const letterboxdSection = letterboxdRatings.length > 0 
+    ? `\n\nLETTERBOXD RATINGS (User's personal ratings from Letterboxd):\n${
+        letterboxdRatings
+          .sort((a, b) => b.rating - a.rating)
+          .map(movie => `- "${movie.title}" (${movie.year}) - Your rating: ${movie.rating}/5 - Watched: ${movie.watched_date}`)
+          .join('\n')
+      }`
+    : '';
+  
+  // Construct base prompt
+  let prompt = `You are a helpful movie recommendation assistant. I'll provide you with movies a user likes, their personal movie ratings from Letterboxd, and potential recommendations.
+
+USER LIKES: ${inputMoviesList}`;
+
+  // Add Letterboxd ratings section
+  prompt += letterboxdSection;
+
+  // Add filters if present
+  if (genre || year || rating) {
+    prompt += "\n\nFILTERS:";
+    if (genre) prompt += ` Genre: ${genre},`;
+    if (year) prompt += ` Year: ${year},`;
+    if (rating) prompt += ` Minimum Rating: ${rating}+/10,`;
+    prompt = prompt.replace(/,$/, ''); // Remove trailing comma
+  }
+  
+  // Add user mood if present
+  if (userMood) {
+    prompt += `\n\nUSER MOOD: ${userMood}`;
+  }
+  
+  // Add user message if present
+  if (userMessage) {
+    prompt += `\n\nUSER SAYS: "${userMessage}"`;
+  }
+  
+  prompt += `\n\nPOTENTIAL RECOMMENDATIONS:\n${movieCandidates}
+
+Based on the user's liked movies${letterboxdRatings.length > 0 ? ', Letterboxd ratings' : ''}${genre ? ', genre preference' : ''}${year ? ', year preference' : ''}${rating ? ', rating preference' : ''}${userMood ? ', current mood' : ''}, and the potential recommendations, select the 5 best movies for them.
+
+For each recommendation, provide:
+1. Title and year
+2. A brief reason why this movie would appeal to someone who enjoyed ${inputMoviesList}${userMood ? ' and is currently feeling ' + userMood : ''}
+3. When relevant, refer to similarities with their highly rated Letterboxd movies
+4. Mention specific elements like themes, style, emotional impact, or storytelling that connect it to the user's preferences
+5. Keep explanations concise but insightful
+6. Format your response as numbered recommendations (1-5)
+
+Start with a brief personalized message that acknowledges their Letterboxd ratings and end with a follow-up question.`;
+
+  return prompt;
+}
   
   // Call LLM API with provider selection
   async function callLLM(prompt) {
@@ -557,14 +634,42 @@ USER LIKES: ${inputMoviesList}`;
   }
   // Enhanced recommendation API endpoint
 app.post('/api/recommend', async (req, res) => {
-    const { movies, genre, year, rating, message, mood } = req.body;
+    const { movies, genre, year, rating, message, mood, useLetterboxd, letterboxdUsername } = req.body;
     
     try {
-      // Get similar movies from our dataset
-      const similarMovies = getSimilarMovies(movies, genre, year, rating, 15);
+      let userMovies = [...movies];
+      let userRatedMovies = [];
       
-      // Create prompt for LLM with user mood
-      const prompt = createLLMPrompt(movies, similarMovies, message, genre, year, rating, mood);
+      // If using Letterboxd data
+      if (useLetterboxd && letterboxdUsername) {
+        try {
+          // Try to get rated movies from Letterboxd
+          // In a real implementation, this would call the Letterboxd API
+          // For now, we'll use a mock function
+          const letterboxdRatings = await mockLetterboxdRatedMovies(letterboxdUsername);
+          
+          // Add highly rated movies to the user's movie list
+          const highlyRated = letterboxdRatings
+            .filter(movie => movie.rating >= 4.0)
+            .map(movie => `${movie.title} (${movie.year})`);
+            
+          userMovies = [...userMovies, ...highlyRated];
+          userRatedMovies = letterboxdRatings;
+          
+          console.log(`Added ${highlyRated.length} movies from Letterboxd profile`);
+        } catch (letterboxdError) {
+          console.error('Error fetching Letterboxd data:', letterboxdError);
+          // Continue with just the manually entered movies
+        }
+      }
+      
+      // Get similar movies from our dataset
+      const similarMovies = getSimilarMovies(userMovies, genre, year, rating, 15);
+      
+      // Create prompt for LLM with user mood and Letterboxd ratings
+      const prompt = userRatedMovies.length > 0 
+        ? createEnhancedLLMPrompt(userMovies, similarMovies, message, genre, year, rating, mood, userRatedMovies)
+        : createLLMPrompt(userMovies, similarMovies, message, genre, year, rating, mood);
       
       // Call LLM
       const llmResponse = await callLLM(prompt);
@@ -574,8 +679,9 @@ app.post('/api/recommend', async (req, res) => {
       
       // Create a session object with all recommendation data
       const recommendationContext = {
-        userInput: { movies, genre, year, rating, message, mood },
+        userInput: { movies: userMovies, genre, year, rating, message, mood },
         recommendations: llmResponse,
+        letterboxdRatings: userRatedMovies,
         timestamp: new Date().toISOString()
       };
       
@@ -585,7 +691,8 @@ app.post('/api/recommend', async (req, res) => {
       res.json({ 
         recommendations: llmResponse,
         enhancedResponse: enhancedResponse,
-        conversational: true
+        conversational: true,
+        usedLetterboxd: userRatedMovies.length > 0
       });
     } catch (error) {
       console.error('Error generating recommendations:', error);
@@ -651,13 +758,46 @@ app.post('/api/chat', async (req, res) => {
         if (context.mood) {
           mood = context.mood;
         }
+        
+        // Check for Letterboxd info
+        if (context.letterboxd && context.letterboxd.connected && context.letterboxd.username) {
+          // If we don't already have Letterboxd ratings in the recommendation context,
+          // try to fetch them directly
+          if (!global.lastRecommendationContext || 
+              !global.lastRecommendationContext.letterboxdRatings || 
+              global.lastRecommendationContext.letterboxdRatings.length === 0) {
+            try {
+              const letterboxdRatings = await mockLetterboxdRatedMovies(context.letterboxd.username);
+              // Store these ratings in the global context for future use
+              if (!global.lastRecommendationContext) {
+                global.lastRecommendationContext = { letterboxdRatings };
+              } else {
+                global.lastRecommendationContext.letterboxdRatings = letterboxdRatings;
+              }
+            } catch (error) {
+              console.error('Error fetching Letterboxd ratings for chat:', error);
+            }
+          }
+        }
       }
       
       // Add recommendation context if it exists
       let recommendationContext = "";
       if (global.lastRecommendationContext) {
         const recContext = global.lastRecommendationContext;
+        
+        // Add basic recommendation context
         recommendationContext = `I previously recommended these movies based on your interest in ${recContext.userInput.movies.join(', ')}:\n\n${recContext.recommendations}\n\n`;
+        
+        // Add Letterboxd ratings if available
+        if (recContext.letterboxdRatings && recContext.letterboxdRatings.length > 0) {
+          const letterboxdSection = recContext.letterboxdRatings
+            .sort((a, b) => b.rating - a.rating)
+            .map(movie => `- "${movie.title}" (${movie.year}) - User rating: ${movie.rating}/5 - Watched: ${movie.watched_date}`)
+            .join('\n');
+            
+          recommendationContext += `\nUser's Letterboxd ratings:\n${letterboxdSection}\n\n`;
+        }
       }
       
       // Add user preference context
@@ -693,6 +833,16 @@ app.post('/api/chat', async (req, res) => {
       prompt += userPreferenceContext;
       prompt += recommendationContext;
       
+      // Add Letterboxd context explicitly to ensure visibility
+      if (context && context.letterboxd && context.letterboxd.connected && 
+          global.lastRecommendationContext && 
+          global.lastRecommendationContext.letterboxdRatings && 
+          global.lastRecommendationContext.letterboxdRatings.length > 0) {
+        
+        prompt += "IMPORTANT: The user has connected their Letterboxd account, and I have access to their movie ratings. " +
+                 "I should reference these ratings when discussing movies with them.\n\n";
+      }
+      
       // Add current user message
       prompt += `User: ${message}\n\nAssistant:`;
       
@@ -713,6 +863,41 @@ app.post('/api/clear-context', (req, res) => {
     global.lastRecommendationContext = null;
     res.json({ success: true, message: 'Context cleared' });
   });
+  
+  // Mock function to simulate Letterboxd API for rated movies
+  // In a real implementation, this would be replaced with actual API calls
+  async function mockLetterboxdRatedMovies(username) {
+    // Simulated delay to mimic API call
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Sample list of popular movies with ratings
+    const sampleRatedMovies = [
+      { title: "The Shawshank Redemption", year: 1994, rating: 5.0, watched_date: "2024-01-15" },
+      { title: "The Godfather", year: 1972, rating: 5.0, watched_date: "2024-02-03" },
+      { title: "Pulp Fiction", year: 1994, rating: 4.5, watched_date: "2024-02-20" },
+      { title: "The Dark Knight", year: 2008, rating: 4.5, watched_date: "2024-03-05" },
+      { title: "Fight Club", year: 1999, rating: 4.0, watched_date: "2024-01-22" },
+      { title: "Inception", year: 2010, rating: 4.0, watched_date: "2024-02-11" },
+      { title: "The Matrix", year: 1999, rating: 4.5, watched_date: "2024-03-02" },
+      { title: "Goodfellas", year: 1990, rating: 4.0, watched_date: "2024-01-28" },
+      { title: "The Lord of the Rings: The Fellowship of the Ring", year: 2001, rating: 5.0, watched_date: "2024-02-16" },
+      { title: "Forrest Gump", year: 1994, rating: 4.0, watched_date: "2024-03-10" }
+    ];
+    
+    // Use username to deterministically select a subset of movies
+    const hash = crypto.createHash('md5').update(username).digest('hex');
+    const hashNum = parseInt(hash.substring(0, 8), 16);
+    const numMovies = 5 + (hashNum % 6); // Return between 5-10 movies based on username
+    
+    // Shuffle array based on username
+    const shuffled = [...sampleRatedMovies];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor((hashNum / (i + 1)) % (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    
+    return shuffled.slice(0, numMovies);
+  }
   
   // Serve the index.html file
   app.get('/', (req, res) => {

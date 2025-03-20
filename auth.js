@@ -77,6 +77,7 @@ router.post('/signup', async (req, res) => {
       password: hashedPassword,
       favorites: [],
       watchlist: [],
+      letterboxd_username: '',
       created_at: new Date().toISOString()
     };
     
@@ -170,7 +171,8 @@ router.get('/profile', authenticateToken, (req, res) => {
       username: user.username,
       email: user.email,
       favorites: user.favorites || [],
-      watchlist: user.watchlist || []
+      watchlist: user.watchlist || [],
+      letterboxd_username: user.letterboxd_username || ''
     });
   } catch (error) {
     console.error('Profile error:', error);
