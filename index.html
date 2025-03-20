@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <!-- Add this to the top of your index.html -->
+    <!-- Improved navbar with user info -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
       <a class="navbar-brand" href="/">
@@ -14,21 +14,35 @@
           <li class="nav-item">
             <a class="nav-link active" href="/"><i class="fas fa-home me-1"></i>Home</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item auth-required" style="display: none;">
             <a class="nav-link" href="/favorites"><i class="fas fa-heart me-1"></i>Favorites</a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item auth-required" style="display: none;">
             <a class="nav-link" href="/watchlist"><i class="fas fa-list me-1"></i>Watchlist</a>
           </li>
         </ul>
-        <div class="d-flex" id="auth-buttons">
-          <!-- These will be replaced dynamically based on auth status -->
+        <!-- Auth buttons for guests (not logged in) -->
+        <div class="d-flex auth-guest" id="auth-buttons">
           <a href="/login" class="btn btn-outline-light me-2">
             <i class="fas fa-sign-in-alt me-1"></i>Login
           </a>
           <a href="/login#signup" class="btn btn-primary">
             <i class="fas fa-user-plus me-1"></i>Sign Up
           </a>
+        </div>
+        
+        <!-- User dropdown for authenticated users -->
+        <div class="dropdown auth-user" style="display: none;">
+          <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-circle me-1"></i>
+            <span id="username-display">User</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="/favorites"><i class="fas fa-heart me-2"></i>My Favorites</a></li>
+            <li><a class="dropdown-item" href="/watchlist"><i class="fas fa-list me-2"></i>My Watchlist</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" id="logout-btn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+          </ul>
         </div>
       </div>
     </div>
@@ -38,6 +52,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LLM Movie Recommendations</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -582,6 +598,86 @@
             color: var(--accent-color);
             font-weight: 500;
         }
+        
+        /* Movie action buttons */
+        .movie-actions {
+            display: flex;
+            margin-top: 1rem;
+            gap: 0.5rem;
+        }
+        
+        .movie-action-btn {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .movie-action-btn i {
+            margin-right: 0.5rem;
+        }
+        
+        .movie-action-btn.favorite {
+            color: #e74c3c;
+        }
+        
+        .movie-action-btn.watchlist {
+            color: #3498db;
+        }
+        
+        .movie-action-btn:hover {
+            background-color: #f8f8f8;
+            border-color: #bbb;
+        }
+        
+        .movie-action-btn.active {
+            background-color: #f0f0f0;
+            border-color: #aaa;
+        }
+        
+        /* User stats box */
+        .user-stats {
+            background-color: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+        
+        .user-stats-title {
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .user-stats-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        
+        .stat-item {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -590,6 +686,25 @@
             <h1>LLM Movie Recommendations</h1>
             <p class="subtitle">Discover your next favorite films with AI-powered recommendations</p>
         </header>
+
+        <!-- User Stats Box (only shown when logged in) -->
+        <div class="user-stats auth-required" id="userStats">
+            <div class="user-stats-title">Your Movie Profile</div>
+            <div class="user-stats-info">
+                <div class="stat-item">
+                    <div class="stat-value" id="favoritesCount">0</div>
+                    <div class="stat-label">Favorites</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="watchlistCount">0</div>
+                    <div class="stat-label">Watchlist</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="recommendationsCount">0</div>
+                    <div class="stat-label">Recommendations</div>
+                </div>
+            </div>
+        </div>
 
         <main>
             <div class="input-form">
@@ -668,6 +783,20 @@
                                     <option value="6">6+</option>
                                 </select>
                             </div>
+                            <div>
+                                <label for="moodSelect">Your mood:</label>
+                                <select id="moodSelect">
+                                    <option value="">Any mood</option>
+                                    <option value="happy">Happy</option>
+                                    <option value="sad">Sad</option>
+                                    <option value="relaxed">Relaxed</option>
+                                    <option value="excited">Excited</option>
+                                    <option value="stressed">Stressed</option>
+                                    <option value="thoughtful">Thoughtful</option>
+                                    <option value="bored">Bored</option>
+                                    <option value="nostalgic">Nostalgic</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
@@ -711,6 +840,7 @@
         </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Elements
@@ -720,6 +850,7 @@
             const recommendationsSection = document.getElementById('recommendationsSection');
             const filtersToggle = document.getElementById('filtersToggle');
             const filtersContent = document.getElementById('filtersContent');
+            const userStats = document.getElementById('userStats');
             
             // Chat elements
             const chatSection = document.getElementById('chatSection');
@@ -728,11 +859,53 @@
             const chatInput = document.getElementById('chatInput');
             const chatSubmit = document.getElementById('chatSubmit');
             
+            // Stats counters
+            const favoritesCount = document.getElementById('favoritesCount');
+            const watchlistCount = document.getElementById('watchlistCount');
+            const recommendationsCount = document.getElementById('recommendationsCount');
+            
+            // Recommendation counter
+            let totalRecommendations = 0;
+            
             // Chat history
             let chatHistory = [];
             
             // API base URL - change this to your server URL
             const API_BASE_URL = 'http://localhost:3000/api';
+            
+            // Load user data if logged in
+            if (isLoggedIn()) {
+                loadUserStats();
+                userStats.style.display = 'block';
+            }
+            
+            // Load user stats
+            function loadUserStats() {
+                // Get favorites
+                getFavorites()
+                    .then(favorites => {
+                        if (Array.isArray(favorites)) {
+                            favoritesCount.textContent = favorites.length;
+                            localStorage.setItem('favorites', JSON.stringify(favorites));
+                        }
+                    })
+                    .catch(err => console.error('Error loading favorites:', err));
+                
+                // Get watchlist
+                getWatchlist()
+                    .then(watchlist => {
+                        if (Array.isArray(watchlist)) {
+                            watchlistCount.textContent = watchlist.length;
+                            localStorage.setItem('watchlist', JSON.stringify(watchlist));
+                        }
+                    })
+                    .catch(err => console.error('Error loading watchlist:', err));
+                
+                // Set recommendations count (from localStorage or 0)
+                const savedCount = localStorage.getItem('recommendationsCount');
+                recommendationsCount.textContent = savedCount || '0';
+                totalRecommendations = parseInt(savedCount || '0');
+            }
             
             // Toggle filters visibility
             filtersToggle.addEventListener('click', function() {
@@ -781,10 +954,37 @@
                 // Show typing indicator
                 showTypingIndicator();
                 
+                // Get user data for personalization
+                let seenMovies = [];
+                let favorites = [];
+                
+                // If user is logged in, get their data
+                const token = localStorage.getItem('token');
+                if (token) {
+                    // Get favorites and watchlist if available
+                    const userFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                    const userWatchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
+                    
+                    // Get movie titles instead of IDs
+                    if (movieData.length > 0) {
+                        favorites = userFavorites.map(id => {
+                            const movie = movieData.find(m => m.id === id);
+                            return movie ? `${movie.title} (${movie.year})` : null;
+                        }).filter(Boolean);
+                        
+                        seenMovies = userWatchlist.map(id => {
+                            const movie = movieData.find(m => m.id === id);
+                            return movie ? `${movie.title} (${movie.year})` : null;
+                        }).filter(Boolean);
+                    }
+                }
+                
                 // Get current recommendation context
                 const context = {
                     movies: getCurrentMovies(),
-                    filters: getCurrentFilters()
+                    filters: getCurrentFilters(),
+                    seenMovies: seenMovies,
+                    favorites: favorites
                 };
                 
                 // Add message to history
@@ -934,7 +1134,8 @@
                 return {
                     genre: document.getElementById('genreSelect').value,
                     year: document.getElementById('yearSelect').value,
-                    rating: document.getElementById('ratingSelect').value
+                    rating: document.getElementById('ratingSelect').value,
+                    mood: document.getElementById('moodSelect').value
                 };
             }
             
@@ -1036,6 +1237,7 @@
                 const genre = document.getElementById('genreSelect').value;
                 const year = document.getElementById('yearSelect').value;
                 const rating = document.getElementById('ratingSelect').value;
+                const mood = document.getElementById('moodSelect').value;
                 
                 // Show loading state
                 recommendationsSection.innerHTML = `
@@ -1060,6 +1262,7 @@
                         genre: genre, 
                         year: year, 
                         rating: rating,
+                        mood: mood,
                         message: '' // Optional user message
                     })
                 })
@@ -1074,9 +1277,16 @@
                     chatHistory.push({
                         type: 'recommendation',
                         movies: movieInputs,
-                        filters: { genre, year, rating },
+                        filters: { genre, year, rating, mood },
                         timestamp: new Date().toISOString()
                     });
+                    
+                    // Update recommendation count for logged in users
+                    if (isLoggedIn()) {
+                        totalRecommendations++;
+                        recommendationsCount.textContent = totalRecommendations;
+                        localStorage.setItem('recommendationsCount', totalRecommendations.toString());
+                    }
                     
                     // Process and display recommendations
                     if (data.conversational && data.enhancedResponse) {
@@ -1112,6 +1322,25 @@
                     const movieCard = document.createElement('div');
                     movieCard.className = 'movie-card';
                     
+                    // Check if movie is in favorites/watchlist
+                    const inFavorites = isInFavorites(movie.id);
+                    const inWatchlist = isInWatchlist(movie.id);
+                    
+                    // Movie actions HTML (only for logged in users)
+                    let movieActionsHtml = '';
+                    if (isLoggedIn()) {
+                        movieActionsHtml = `
+                            <div class="movie-actions">
+                                <button class="movie-action-btn favorite ${inFavorites ? 'active' : ''}" data-movie-id="${movie.id}">
+                                    <i class="fas ${inFavorites ? 'fa-heart' : 'fa-heart-o'}"></i> ${inFavorites ? 'Favorited' : 'Add to Favorites'}
+                                </button>
+                                <button class="movie-action-btn watchlist ${inWatchlist ? 'active' : ''}" data-movie-id="${movie.id}">
+                                    <i class="fas ${inWatchlist ? 'fa-check-square' : 'fa-square-o'}"></i> ${inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
+                                </button>
+                            </div>
+                        `;
+                    }
+                    
                     movieCard.innerHTML = `
                         <img src="${movie.poster}" alt="${movie.title}" class="movie-poster">
                         <div class="movie-info">
@@ -1121,10 +1350,93 @@
                                 <span>Rating: ${movie.rating}/10</span>
                             </div>
                             <p class="movie-description">${movie.description}</p>
+                            ${movieActionsHtml}
                         </div>
                     `;
                     
                     recommendationsSection.appendChild(movieCard);
+                    
+                    // Add event listeners to buttons if user is logged in
+                    if (isLoggedIn()) {
+                        const favoriteBtn = movieCard.querySelector('.favorite');
+                        const watchlistBtn = movieCard.querySelector('.watchlist');
+                        
+                        // Favorite button action
+                        favoriteBtn.addEventListener('click', function() {
+                            const movieId = this.getAttribute('data-movie-id');
+                            const isFavorite = this.classList.contains('active');
+                            
+                            if (isFavorite) {
+                                // Remove from favorites
+                                removeFromFavorites(movieId)
+                                    .then(response => {
+                                        this.classList.remove('active');
+                                        this.innerHTML = '<i class="fas fa-heart-o"></i> Add to Favorites';
+                                        
+                                        // Update favorites count
+                                        const currentCount = parseInt(favoritesCount.textContent) - 1;
+                                        favoritesCount.textContent = currentCount >= 0 ? currentCount : 0;
+                                        
+                                        // Update localStorage
+                                        updateLocalStorageFavorites(movieId, false);
+                                    })
+                                    .catch(err => console.error('Error removing from favorites:', err));
+                            } else {
+                                // Add to favorites
+                                addToFavorites(movieId)
+                                    .then(response => {
+                                        this.classList.add('active');
+                                        this.innerHTML = '<i class="fas fa-heart"></i> Favorited';
+                                        
+                                        // Update favorites count
+                                        const currentCount = parseInt(favoritesCount.textContent) + 1;
+                                        favoritesCount.textContent = currentCount;
+                                        
+                                        // Update localStorage
+                                        updateLocalStorageFavorites(movieId, true);
+                                    })
+                                    .catch(err => console.error('Error adding to favorites:', err));
+                            }
+                        });
+                        
+                        // Watchlist button action
+                        watchlistBtn.addEventListener('click', function() {
+                            const movieId = this.getAttribute('data-movie-id');
+                            const isInWatchlist = this.classList.contains('active');
+                            
+                            if (isInWatchlist) {
+                                // Remove from watchlist
+                                removeFromWatchlist(movieId)
+                                    .then(response => {
+                                        this.classList.remove('active');
+                                        this.innerHTML = '<i class="fas fa-square-o"></i> Add to Watchlist';
+                                        
+                                        // Update watchlist count
+                                        const currentCount = parseInt(watchlistCount.textContent) - 1;
+                                        watchlistCount.textContent = currentCount >= 0 ? currentCount : 0;
+                                        
+                                        // Update localStorage
+                                        updateLocalStorageWatchlist(movieId, false);
+                                    })
+                                    .catch(err => console.error('Error removing from watchlist:', err));
+                            } else {
+                                // Add to watchlist
+                                addToWatchlist(movieId)
+                                    .then(response => {
+                                        this.classList.add('active');
+                                        this.innerHTML = '<i class="fas fa-check-square"></i> In Watchlist';
+                                        
+                                        // Update watchlist count
+                                        const currentCount = parseInt(watchlistCount.textContent) + 1;
+                                        watchlistCount.textContent = currentCount;
+                                        
+                                        // Update localStorage
+                                        updateLocalStorageWatchlist(movieId, true);
+                                    })
+                                    .catch(err => console.error('Error adding to watchlist:', err));
+                            }
+                        });
+                    }
                 });
                 
                 // Add chat prompt
@@ -1147,6 +1459,54 @@
                         chatInput.value = 'Tell me more about these recommendations';
                     }, 500);
                 });
+            }
+            
+            // Update localStorage for favorites
+            function updateLocalStorageFavorites(movieId, add) {
+                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                
+                if (add) {
+                    if (!favorites.includes(movieId)) {
+                        favorites.push(movieId);
+                    }
+                } else {
+                    const index = favorites.indexOf(movieId);
+                    if (index !== -1) {
+                        favorites.splice(index, 1);
+                    }
+                }
+                
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+            }
+            
+            // Update localStorage for watchlist
+            function updateLocalStorageWatchlist(movieId, add) {
+                const watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
+                
+                if (add) {
+                    if (!watchlist.includes(movieId)) {
+                        watchlist.push(movieId);
+                    }
+                } else {
+                    const index = watchlist.indexOf(movieId);
+                    if (index !== -1) {
+                        watchlist.splice(index, 1);
+                    }
+                }
+                
+                localStorage.setItem('watchlist', JSON.stringify(watchlist));
+            }
+            
+            // Check if movie is in favorites
+            function isInFavorites(movieId) {
+                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                return favorites.includes(movieId);
+            }
+            
+            // Check if movie is in watchlist
+            function isInWatchlist(movieId) {
+                const watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
+                return watchlist.includes(movieId);
             }
             
             // Parse LLM response text into structured recommendations
@@ -1439,6 +1799,5 @@
     </script>
     <!-- In your index.html, login.html, etc. -->
 <script src="/auth-frontend.js"></script>
-<script src="/auth.js"></script>
 </body>
 </html>

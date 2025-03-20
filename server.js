@@ -220,7 +220,7 @@ function getSimilarMovies(inputTitles, genre, year, rating, count = 10) {
 }
 
 // Create LLM prompt
-function createLLMPrompt(inputMovies, similarMovies, userMessage = '', genre = '', year = '', rating = '') {
+function createLLMPrompt(inputMovies, similarMovies, userMessage = '', genre = '', year = '', rating = '', userMood = '') {
   // Format input movies
   const inputMoviesList = inputMovies.join(', ');
   
@@ -250,6 +250,11 @@ USER LIKES: ${inputMoviesList}`;
     prompt = prompt.replace(/,$/, ''); // Remove trailing comma
   }
   
+  // Add user mood if present
+  if (userMood) {
+    prompt += `\n\nUSER MOOD: ${userMood}`;
+  }
+  
   // Add user message if present
   if (userMessage) {
     prompt += `\n\nUSER SAYS: "${userMessage}"`;
@@ -257,11 +262,11 @@ USER LIKES: ${inputMoviesList}`;
   
   prompt += `\n\nPOTENTIAL RECOMMENDATIONS:\n${movieCandidates}
 
-  Based on the user's liked movies${genre ? ', genre preference' : ''}${year ? ', year preference' : ''}${rating ? ', rating preference' : ''}, and the potential recommendations, select the 5 best movies for them.
+  Based on the user's liked movies${genre ? ', genre preference' : ''}${year ? ', year preference' : ''}${rating ? ', rating preference' : ''}${userMood ? ', current mood' : ''}, and the potential recommendations, select the 5 best movies for them.
   
   For each recommendation, provide:
   1. Title and year
-  2. A brief reason why this movie would appeal to someone who enjoyed ${inputMoviesList}
+  2. A brief reason why this movie would appeal to someone who enjoyed ${inputMoviesList}${userMood ? ' and is currently feeling ' + userMood : ''}
   3. Mention specific elements like themes, style, emotional impact, or storytelling that connect it to the user's preferences
   4. Keep explanations concise but insightful
   5. Format your response as numbered recommendations (1-5)
@@ -552,14 +557,14 @@ USER LIKES: ${inputMoviesList}`;
   }
   // Enhanced recommendation API endpoint
 app.post('/api/recommend', async (req, res) => {
-    const { movies, genre, year, rating, message } = req.body;
+    const { movies, genre, year, rating, message, mood } = req.body;
     
     try {
       // Get similar movies from our dataset
       const similarMovies = getSimilarMovies(movies, genre, year, rating, 15);
       
-      // Create prompt for LLM
-      const prompt = createLLMPrompt(movies, similarMovies, message, genre, year, rating);
+      // Create prompt for LLM with user mood
+      const prompt = createLLMPrompt(movies, similarMovies, message, genre, year, rating, mood);
       
       // Call LLM
       const llmResponse = await callLLM(prompt);
@@ -567,14 +572,14 @@ app.post('/api/recommend', async (req, res) => {
       // Process LLM response to add movie data
       const enhancedResponse = await enhanceResponseWithMovieData(llmResponse, similarMovies);
       
-      // Create a session object with all recommendation data (ADD THIS)
+      // Create a session object with all recommendation data
       const recommendationContext = {
-        userInput: { movies, genre, year, rating, message },
+        userInput: { movies, genre, year, rating, message, mood },
         recommendations: llmResponse,
         timestamp: new Date().toISOString()
       };
       
-      // Store in a global variable for the session (ADD THIS)
+      // Store in a global variable for the session
       global.lastRecommendationContext = recommendationContext;
       
       res.json({ 
@@ -583,22 +588,45 @@ app.post('/api/recommend', async (req, res) => {
         conversational: true
       });
     } catch (error) {
-      // ...rest of error handling remains the same
+      console.error('Error generating recommendations:', error);
+      
+      // Fallback to basic recommendations
+      const similarMovies = getSimilarMovies(movies, genre, year, rating, 5);
+      const basicRecommendations = similarMovies.map((movie, index) => 
+        formatRecommendation(movie, movies, index + 1)
+      ).join('\n\n');
+      
+      res.json({ 
+        recommendations: basicRecommendations,
+        conversational: false,
+        error: error.message
+      });
     }
   });
   // Chat with the LLM about movies
 app.post('/api/chat', async (req, res) => {
-    const { message, history } = req.body;
+    const { message, history, context } = req.body;
     
     try {
       // Get context from chat history
       let likedMovies = [];
+      let chatMessages = [];
       let genre = '';
       let year = '';
       let rating = '';
+      let mood = '';
+      let seenMovies = [];
+      let favorites = [];
       
-      // Extract context from history
+      // Extract context and chat history
       if (history && history.length > 0) {
+        // Get the last few messages for chat context (limit to 10 exchanges)
+        const recentHistory = history.slice(-10);
+        chatMessages = recentHistory
+          .filter(entry => entry.type === 'user' || entry.type === 'bot')
+          .map(entry => `${entry.type === 'user' ? 'User' : 'Assistant'}: ${entry.message}`);
+        
+        // Extract recommendation context
         for (const entry of history) {
           if (entry.type === 'recommendation' && entry.movies) {
             likedMovies = entry.movies;
@@ -607,24 +635,66 @@ app.post('/api/chat', async (req, res) => {
             genre = entry.filters.genre || '';
             year = entry.filters.year || '';
             rating = entry.filters.rating || '';
+            mood = entry.filters.mood || '';
           }
         }
       }
       
-      // Add recommendation context if it exists and the message appears to be asking about recommendations (ADD THIS)
-      let contextualPrompt = "";
-      if (global.lastRecommendationContext && 
-          message.toLowerCase().includes("recommendation") || 
-          message.toLowerCase().includes("tell me more") || 
-          message.toLowerCase().includes("why did you") || 
-          message.toLowerCase().includes("explain")) {
-        
-        const recContext = global.lastRecommendationContext;
-        contextualPrompt = `I previously recommended these movies based on your interest in ${recContext.userInput.movies.join(', ')}:\n\n${recContext.recommendations}\n\n`;
+      // Get additional context from request if provided
+      if (context) {
+        if (context.seenMovies && Array.isArray(context.seenMovies)) {
+          seenMovies = context.seenMovies;
+        }
+        if (context.favorites && Array.isArray(context.favorites)) {
+          favorites = context.favorites;
+        }
+        if (context.mood) {
+          mood = context.mood;
+        }
       }
       
-      // Create prompt with context
-      const prompt = `${contextualPrompt}User: ${message}\n\nAssistant:`;
+      // Add recommendation context if it exists
+      let recommendationContext = "";
+      if (global.lastRecommendationContext) {
+        const recContext = global.lastRecommendationContext;
+        recommendationContext = `I previously recommended these movies based on your interest in ${recContext.userInput.movies.join(', ')}:\n\n${recContext.recommendations}\n\n`;
+      }
+      
+      // Add user preference context
+      let userPreferenceContext = "";
+      if (seenMovies.length > 0 || favorites.length > 0 || mood) {
+        userPreferenceContext = "User preferences:\n";
+        
+        if (favorites.length > 0) {
+          userPreferenceContext += `- Favorite movies: ${favorites.join(', ')}\n`;
+        }
+        
+        if (seenMovies.length > 0) {
+          userPreferenceContext += `- Recently seen movies: ${seenMovies.join(', ')}\n`;
+        }
+        
+        if (mood) {
+          userPreferenceContext += `- Current mood: ${mood}\n`;
+        }
+        
+        userPreferenceContext += "\n";
+      }
+      
+      // Create prompt with all context
+      let prompt = "You are a helpful movie recommendation assistant. ";
+      
+      // Add chat history context if available
+      if (chatMessages.length > 0) {
+        prompt += "Here's our recent conversation:\n\n";
+        prompt += chatMessages.join('\n') + '\n\n';
+      }
+      
+      // Add user preferences and recommendation context
+      prompt += userPreferenceContext;
+      prompt += recommendationContext;
+      
+      // Add current user message
+      prompt += `User: ${message}\n\nAssistant:`;
       
       // Call LLM
       const llmResponse = await callLLM(prompt);
