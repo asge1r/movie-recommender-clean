@@ -6,8 +6,8 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
 
-// Secret key for JWT
-const JWT_SECRET = 'your-secret-key-change-this';
+// Secret key for JWT (preferably from environment variable)
+const JWT_SECRET = process.env.JWT_SECRET || '2f9a5f1c03b4e7d6a9c8b7d6a9f2c3b6a9f2e5d8c7b6a9f3c6e9d2a5f8c7b4a1';
 
 // User data file path
 const USERS_FILE = path.join(__dirname, 'data', 'users.json');
@@ -69,15 +69,17 @@ router.post('/signup', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     
-    // Create new user
+    // Create new user with enhanced profile fields
     const newUser = {
       id: Date.now().toString(),
       username,
       email,
       password: hashedPassword,
-      favorites: [],
-      watchlist: [],
+      favorites: [],      // Store full movie objects
+      watchlist: [],      // Store full movie objects
       letterboxd_username: '',
+      recommendations_count: 0,
+      last_recommendation_date: null,
       created_at: new Date().toISOString()
     };
     
@@ -87,7 +89,10 @@ router.post('/signup', async (req, res) => {
     
     // Create token
     const token = jwt.sign(
-      { id: newUser.id, username: newUser.username },
+      { 
+        id: newUser.id, 
+        username: newUser.username 
+      },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -99,7 +104,10 @@ router.post('/signup', async (req, res) => {
       user: {
         id: newUser.id,
         username: newUser.username,
-        email: newUser.email
+        email: newUser.email,
+        favorites: newUser.favorites,
+        watchlist: newUser.watchlist,
+        recommendations_count: 0
       }
     });
   } catch (error) {
@@ -135,7 +143,10 @@ router.post('/login', async (req, res) => {
     
     // Create token
     const token = jwt.sign(
-      { id: user.id, username: user.username },
+      { 
+        id: user.id, 
+        username: user.username 
+      },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -147,7 +158,11 @@ router.post('/login', async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        email: user.email
+        email: user.email,
+        favorites: user.favorites || [],
+        watchlist: user.watchlist || [],
+        recommendations_count: user.recommendations_count || 0,
+        letterboxd_username: user.letterboxd_username || ''
       }
     });
   } catch (error) {
@@ -156,7 +171,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Protected route example
+// Profile endpoint with full user details
 router.get('/profile', authenticateToken, (req, res) => {
   try {
     const users = loadUsers();
@@ -172,7 +187,10 @@ router.get('/profile', authenticateToken, (req, res) => {
       email: user.email,
       favorites: user.favorites || [],
       watchlist: user.watchlist || [],
-      letterboxd_username: user.letterboxd_username || ''
+      recommendations_count: user.recommendations_count || 0,
+      letterboxd_username: user.letterboxd_username || '',
+      created_at: user.created_at,
+      last_recommendation_date: user.last_recommendation_date
     });
   } catch (error) {
     console.error('Profile error:', error);
@@ -186,7 +204,7 @@ function authenticateToken(req, res, next) {
   const token = authHeader && authHeader.split(' ')[1];
   
   if (!token) {
-    return res.status(401).json({ error: 'Access denied' });
+    return res.status(401).json({ error: 'Access denied. No token provided.' });
   }
   
   try {
@@ -194,7 +212,11 @@ function authenticateToken(req, res, next) {
     req.user = verified;
     next();
   } catch (error) {
-    return res.status(403).json({ error: 'Invalid token' });
+    // Different error messages for different token issues
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired. Please log in again.' });
+    }
+    return res.status(403).json({ error: 'Invalid token. Authentication failed.' });
   }
 }
 
