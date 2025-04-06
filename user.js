@@ -37,16 +37,14 @@ function saveUsers(users) {
 // Add movie to favorites
 router.post('/favorites/add', authenticateToken, (req, res) => {
   try {
-    const { movieId } = req.body;
-    console.log('Movie ID:', movieId);
-    if (!movieId) {
+    const { movie } = req.body;
+    if (!movie || !movie.id) {
       return res.status(400).json({ error: 'Movie details are required' });
     }
 
-
     const users = loadUsers();
     const userIndex = users.findIndex(user => user.id === req.user.id);
-    
+
     if (userIndex === -1) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -69,9 +67,9 @@ router.post('/favorites/add', authenticateToken, (req, res) => {
     users[userIndex].favorites.push(movie);
     saveUsers(users);
 
-    res.json({ 
+    res.json({
       message: 'Movie added to favorites',
-      favorites: users[userIndex].favorites 
+      favorites: users[userIndex].favorites
     });
   } catch (error) {
     console.error('Add to favorites error:', error);
@@ -89,7 +87,7 @@ router.post('/favorites/remove', authenticateToken, (req, res) => {
 
     const users = loadUsers();
     const userIndex = users.findIndex(user => user.id === req.user.id);
-    
+
     if (userIndex === -1) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -111,9 +109,9 @@ router.post('/favorites/remove', authenticateToken, (req, res) => {
 
     saveUsers(users);
 
-    res.json({ 
+    res.json({
       message: 'Movie removed from favorites',
-      favorites: users[userIndex].favorites 
+      favorites: users[userIndex].favorites
     });
   } catch (error) {
     console.error('Remove from favorites error:', error);
@@ -131,7 +129,7 @@ router.post('/watchlist/add', authenticateToken, (req, res) => {
 
     const users = loadUsers();
     const userIndex = users.findIndex(user => user.id === req.user.id);
-    
+
     if (userIndex === -1) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -154,9 +152,9 @@ router.post('/watchlist/add', authenticateToken, (req, res) => {
     users[userIndex].watchlist.push(movie);
     saveUsers(users);
 
-    res.json({ 
+    res.json({
       message: 'Movie added to watchlist',
-      watchlist: users[userIndex].watchlist 
+      watchlist: users[userIndex].watchlist
     });
   } catch (error) {
     console.error('Add to watchlist error:', error);
@@ -174,7 +172,7 @@ router.post('/watchlist/remove', authenticateToken, (req, res) => {
 
     const users = loadUsers();
     const userIndex = users.findIndex(user => user.id === req.user.id);
-    
+
     if (userIndex === -1) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -196,13 +194,59 @@ router.post('/watchlist/remove', authenticateToken, (req, res) => {
 
     saveUsers(users);
 
-    res.json({ 
+    res.json({
       message: 'Movie removed from watchlist',
-      watchlist: users[userIndex].watchlist 
+      watchlist: users[userIndex].watchlist
     });
   } catch (error) {
     console.error('Remove from watchlist error:', error);
     res.status(500).json({ error: 'Server error removing from watchlist' });
+  }
+});
+
+// Get user's favorites
+router.get('/favorites', authenticateToken, (req, res) => {
+  try {
+    const users = loadUsers();
+    const userIndex = users.findIndex(u => u.id === req.user.id);
+
+    if (userIndex === -1) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Ensure favorites array exists
+    if (!users[userIndex].favorites) {
+      users[userIndex].favorites = [];
+      saveUsers(users);
+    }
+
+    res.json({ favorites: users[userIndex].favorites });
+  } catch (error) {
+    console.error('Get favorites error:', error);
+    res.status(500).json({ error: 'Server error getting favorites' });
+  }
+});
+
+// Get user's watchlist
+router.get('/watchlist', authenticateToken, (req, res) => {
+  try {
+    const users = loadUsers();
+    const userIndex = users.findIndex(u => u.id === req.user.id);
+
+    if (userIndex === -1) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Ensure watchlist array exists
+    if (!users[userIndex].watchlist) {
+      users[userIndex].watchlist = [];
+      saveUsers(users);
+    }
+
+    res.json({ watchlist: users[userIndex].watchlist });
+  } catch (error) {
+    console.error('Get watchlist error:', error);
+    res.status(500).json({ error: 'Server error getting watchlist' });
   }
 });
 

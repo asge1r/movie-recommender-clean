@@ -47,57 +47,57 @@ function saveUsers(users) {
 router.post('/signup', async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    
+
     // Basic validation
     if (!username || !email || !password) {
       return res.status(400).json({ error: 'All fields are required' });
     }
-    
+
     // Load existing users
     const users = loadUsers();
-    
+
     // Check if user already exists
     if (users.some(u => u.email === email)) {
       return res.status(400).json({ error: 'Email already in use' });
     }
-    
+
     if (users.some(u => u.username === username)) {
       return res.status(400).json({ error: 'Username already taken' });
     }
-    
+
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    
+
     // Create new user with enhanced profile fields
     const newUser = {
       id: Date.now().toString(),
       username,
       email,
       password: hashedPassword,
-      favorites: [],      // Store full movie objects
-      watchlist: [],      // Store full movie objects
+      favorites: [],      // Initialize empty array
+      watchlist: [],      // Initialize empty array
       letterboxd_username: '',
       recommendations_count: 0,
       last_recommendation_date: null,
       created_at: new Date().toISOString()
     };
-    
+
     // Add to users and save
     users.push(newUser);
     saveUsers(users);
-    
+
     // Create token
     const token = jwt.sign(
-      { 
-        id: newUser.id, 
-        username: newUser.username 
+      {
+        id: newUser.id,
+        username: newUser.username
       },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
-    
-    // Return success
+
+    // Return success with user data (excluding sensitive info)
     return res.status(201).json({
       message: 'User registered successfully',
       token,
@@ -120,37 +120,37 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     // Basic validation
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password required' });
     }
-    
+
     // Load users
     const users = loadUsers();
-    
+
     // Find user
     const user = users.find(u => u.email === email);
     if (!user) {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
-    
+
     // Check password
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
-    
+
     // Create token
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        username: user.username 
+      {
+        id: user.id,
+        username: user.username
       },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
-    
+
     // Return success
     return res.json({
       message: 'Login successful',
@@ -176,11 +176,11 @@ router.get('/profile', authenticateToken, (req, res) => {
   try {
     const users = loadUsers();
     const user = users.find(u => u.id === req.user.id);
-    
+
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
+
     return res.json({
       id: user.id,
       username: user.username,
@@ -202,11 +202,11 @@ router.get('/profile', authenticateToken, (req, res) => {
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  
+
   if (!token) {
     return res.status(401).json({ error: 'Access denied. No token provided.' });
   }
-  
+
   try {
     const verified = jwt.verify(token, JWT_SECRET);
     req.user = verified;
