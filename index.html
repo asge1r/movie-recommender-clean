@@ -1,52 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
-    <!-- Improved navbar with user info -->
+<!-- Improved navbar with user info -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <a class="navbar-brand" href="/">
-        <i class="fas fa-film me-2"></i>Movie Recommender
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link active" href="/"><i class="fas fa-home me-1"></i>Home</a>
-          </li>
-          <li class="nav-item auth-required" style="display: none;">
-            <a class="nav-link" href="/favorites"><i class="fas fa-heart me-1"></i>Favorites</a>
-          </li>
-          <li class="nav-item auth-required" style="display: none;">
-            <a class="nav-link" href="/watchlist"><i class="fas fa-list me-1"></i>Watchlist</a>
-          </li>
-        </ul>
-        <!-- Auth buttons for guests (not logged in) -->
-        <div class="d-flex auth-guest" id="auth-buttons">
-          <a href="/login" class="btn btn-outline-light me-2">
-            <i class="fas fa-sign-in-alt me-1"></i>Login
-          </a>
-          <a href="/login#signup" class="btn btn-primary">
-            <i class="fas fa-user-plus me-1"></i>Sign Up
-          </a>
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-film me-2"></i>Movie Recommender
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/"><i class="fas fa-home me-1"></i>Home</a>
+                </li>
+                <li class="nav-item auth-required" style="display: none;">
+                    <a class="nav-link" href="/favorites"><i class="fas fa-heart me-1"></i>Favorites</a>
+                </li>
+                <li class="nav-item auth-required" style="display: none;">
+                    <a class="nav-link" href="/watchlist"><i class="fas fa-list me-1"></i>Watchlist</a>
+                </li>
+            </ul>
+            <!-- Auth buttons for guests (not logged in) -->
+            <div class="d-flex auth-guest" id="auth-buttons">
+                <a href="/login" class="btn btn-outline-light me-2">
+                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                </a>
+                <a href="/login#signup" class="btn btn-primary">
+                    <i class="fas fa-user-plus me-1"></i>Sign Up
+                </a>
+            </div>
+
+            <!-- User dropdown for authenticated users -->
+            <div class="dropdown auth-user" style="display: none;">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle me-1"></i>
+                    <span id="username-display">User</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li><a class="dropdown-item" href="/favorites"><i class="fas fa-heart me-2"></i>My Favorites</a>
+                    </li>
+                    <li><a class="dropdown-item" href="/watchlist"><i class="fas fa-list me-2"></i>My Watchlist</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="#" id="logout-btn"><i
+                                class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                </ul>
+            </div>
         </div>
-        
-        <!-- User dropdown for authenticated users -->
-        <div class="dropdown auth-user" style="display: none;">
-          <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-user-circle me-1"></i>
-            <span id="username-display">User</span>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-            <li><a class="dropdown-item" href="/favorites"><i class="fas fa-heart me-2"></i>My Favorites</a></li>
-            <li><a class="dropdown-item" href="/watchlist"><i class="fas fa-list me-2"></i>My Watchlist</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#" id="logout-btn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-          </ul>
-        </div>
-      </div>
     </div>
-  </nav>
+</nav>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -287,7 +293,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .about-section {
@@ -544,8 +552,17 @@
         }
 
         @keyframes typing-animation {
-            0%, 100% { opacity: 0.3; transform: translateY(0); }
-            50% { opacity: 1; transform: translateY(-5px); }
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translateY(-5px);
+            }
         }
 
         .ai-suggestion {
@@ -577,7 +594,8 @@
             margin-bottom: 10px;
         }
 
-        .message ul, .message ol {
+        .message ul,
+        .message ol {
             margin-left: 20px;
             margin-bottom: 10px;
         }
@@ -590,7 +608,8 @@
             white-space: pre-wrap;
         }
 
-        .message b, .message strong {
+        .message b,
+        .message strong {
             font-weight: 600;
         }
 
@@ -598,14 +617,14 @@
             color: var(--accent-color);
             font-weight: 500;
         }
-        
+
         /* Movie action buttons */
         .movie-actions {
             display: flex;
             margin-top: 1rem;
             gap: 0.5rem;
         }
-        
+
         .movie-action-btn {
             display: flex;
             align-items: center;
@@ -617,29 +636,29 @@
             font-size: 0.9rem;
             transition: all 0.2s;
         }
-        
+
         .movie-action-btn i {
             margin-right: 0.5rem;
         }
-        
+
         .movie-action-btn.favorite {
             color: #e74c3c;
         }
-        
+
         .movie-action-btn.watchlist {
             color: #3498db;
         }
-        
+
         .movie-action-btn:hover {
             background-color: #f8f8f8;
             border-color: #bbb;
         }
-        
+
         .movie-action-btn.active {
             background-color: #f0f0f0;
             border-color: #aaa;
         }
-        
+
         /* User stats box */
         .user-stats {
             background-color: var(--card-background);
@@ -649,37 +668,38 @@
             margin-bottom: 1.5rem;
             display: none;
         }
-        
+
         .user-stats-title {
             font-weight: 500;
             margin-bottom: 1rem;
             color: var(--primary-color);
         }
-        
+
         .user-stats-info {
             display: flex;
             flex-wrap: wrap;
             gap: 1.5rem;
         }
-        
+
         .stat-item {
             flex: 1;
             min-width: 120px;
             text-align: center;
         }
-        
+
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
             color: var(--accent-color);
         }
-        
+
         .stat-label {
             font-size: 0.9rem;
             color: #666;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -726,16 +746,16 @@
                                 <div id="autocomplete-list1" class="autocomplete-items hidden"></div>
                             </div>
                         </div>
-                        
+
                         <div id="additionalInputs">
                             <!-- Additional inputs will be added here -->
                         </div>
-                        
+
                         <button type="button" id="addMovieBtn" class="add-button">
                             <span class="add-icon">+</span> Add another movie
                         </button>
                     </div>
-                    
+
                     <div class="filters">
                         <div class="filters-title" id="filtersToggle">
                             <span class="filter-icon">⚙️</span> Optional filters
@@ -808,15 +828,15 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <button type="submit" class="submit-button">Get Recommendations</button>
                 </form>
             </div>
-            
+
             <div class="recommendations" id="recommendationsSection">
                 <!-- Recommendations will be displayed here -->
             </div>
-            
+
             <!-- New Chat Interface -->
             <div class="chat-section" id="chatSection">
                 <div class="chat-header">
@@ -826,31 +846,38 @@
                 <div class="chat-messages" id="chatMessages">
                     <div class="message message-bot">
                         <div class="message-content">
-                            Hello! I'm your movie recommendation assistant. Enter some movies you enjoy above, or ask me about specific films, genres, or directors!
+                            Hello! I'm your movie recommendation assistant. Enter some movies you enjoy above, or ask me
+                            about specific films, genres, or directors!
                         </div>
                     </div>
                 </div>
                 <div class="chat-input-container">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="Ask about movies or for recommendations...">
+                    <input type="text" class="chat-input" id="chatInput"
+                        placeholder="Ask about movies or for recommendations...">
                     <button class="chat-submit" id="chatSubmit">Send</button>
                 </div>
             </div>
-            
+
             <div class="about-section">
                 <h2 class="about-title">About This Tool</h2>
-                <p class="about-text">This movie recommendation tool uses advanced Large Language Model (LLM) technology to understand the nuances of your movie preferences and suggest films you're likely to enjoy.</p>
-                <p class="about-text">Unlike traditional recommendation systems that rely solely on genre matching or viewing patterns, our AI understands themes, narrative styles, and the emotional impact that makes a movie resonate with you.</p>
-                <p class="about-text">Each recommendation comes with an explanation of why we think you'll like it, creating a more transparent and personalized experience.</p>
+                <p class="about-text">This movie recommendation tool uses advanced Large Language Model (LLM) technology
+                    to understand the nuances of your movie preferences and suggest films you're likely to enjoy.</p>
+                <p class="about-text">Unlike traditional recommendation systems that rely solely on genre matching or
+                    viewing patterns, our AI understands themes, narrative styles, and the emotional impact that makes a
+                    movie resonate with you.</p>
+                <p class="about-text">Each recommendation comes with an explanation of why we think you'll like it,
+                    creating a more transparent and personalized experience.</p>
             </div>
         </main>
-        
+
         <footer>
             <p>&copy; 2025 LLM Movie Recommendations | Created for REI603M</p>
         </footer>
     </div>
-    
+
     <!-- Letterboxd Connection Modal -->
-    <div class="modal fade" id="letterboxdModal" tabindex="-1" aria-labelledby="letterboxdModalLabel" aria-hidden="true">
+    <div class="modal fade" id="letterboxdModal" tabindex="-1" aria-labelledby="letterboxdModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -858,13 +885,16 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Enter your Letterboxd username to enhance your movie recommendations with your personal ratings.</p>
+                    <p>Enter your Letterboxd username to enhance your movie recommendations with your personal ratings.
+                    </p>
                     <div class="form-group mb-3">
                         <label for="letterboxd-username" class="form-label">Letterboxd Username</label>
-                        <input type="text" class="form-control" id="letterboxd-username" placeholder="Enter your Letterboxd username">
+                        <input type="text" class="form-control" id="letterboxd-username"
+                            placeholder="Enter your Letterboxd username">
                     </div>
                     <div class="alert alert-info">
-                        <small><i class="fas fa-info-circle me-1"></i> We'll use your public ratings to find movies you'll love!</small>
+                        <small><i class="fas fa-info-circle me-1"></i> We'll use your public ratings to find movies
+                            you'll love!</small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -877,7 +907,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Elements
             const movieForm = document.getElementById('movieForm');
             const addMovieBtn = document.getElementById('addMovieBtn');
@@ -886,45 +916,45 @@
             const filtersToggle = document.getElementById('filtersToggle');
             const filtersContent = document.getElementById('filtersContent');
             const userStats = document.getElementById('userStats');
-            
+
             // Chat elements
             const chatSection = document.getElementById('chatSection');
             const chatToggle = document.getElementById('chatToggle');
             const chatMessages = document.getElementById('chatMessages');
             const chatInput = document.getElementById('chatInput');
             const chatSubmit = document.getElementById('chatSubmit');
-            
+
             // Stats counters
             const favoritesCount = document.getElementById('favoritesCount');
             const watchlistCount = document.getElementById('watchlistCount');
             const recommendationsCount = document.getElementById('recommendationsCount');
-            
+
             // Recommendation counter
             let totalRecommendations = 0;
-            
+
             // Chat history
             let chatHistory = [];
-            
+
             // API base URL - change this to your server URL
             const API_BASE_URL = 'http://localhost:3000/api';
-            
+
             // Letterboxd modal elements
             const letterboxdConnectBtn = document.getElementById('letterboxd-connect-btn');
             const saveLetterboxdBtn = document.getElementById('save-letterboxd-btn');
             const letterboxdStatus = document.getElementById('letterboxd-status');
             const letterboxdUsername = document.getElementById('letterboxd-username');
-            
+
             // Letterboxd variables
             let isLetterboxdConnected = false;
             let currentLetterboxdUsername = '';
-            
+
             // Load user data if logged in
             if (isLoggedIn()) {
                 loadUserStats();
                 loadLetterboxdStatus();
                 userStats.style.display = 'block';
             }
-            
+
             // Load user stats
             function loadUserStats() {
                 // Get favorites
@@ -936,7 +966,7 @@
                         }
                     })
                     .catch(err => console.error('Error loading favorites:', err));
-                
+
                 // Get watchlist
                 getWatchlist()
                     .then(watchlist => {
@@ -946,53 +976,53 @@
                         }
                     })
                     .catch(err => console.error('Error loading watchlist:', err));
-                
+
                 // Set recommendations count (from localStorage or 0)
                 const savedCount = localStorage.getItem('recommendationsCount');
                 recommendationsCount.textContent = savedCount || '0';
                 totalRecommendations = parseInt(savedCount || '0');
             }
-            
+
             // Toggle filters visibility
-            filtersToggle.addEventListener('click', function() {
+            filtersToggle.addEventListener('click', function () {
                 filtersContent.classList.toggle('hidden');
             });
-            
+
             // Letterboxd connection button handler
-            letterboxdConnectBtn.addEventListener('click', function() {
+            letterboxdConnectBtn.addEventListener('click', function () {
                 // Open the modal
                 const letterboxdModal = new bootstrap.Modal(document.getElementById('letterboxdModal'));
-                
+
                 // Pre-fill username if connected
                 if (isLetterboxdConnected && currentLetterboxdUsername) {
                     letterboxdUsername.value = currentLetterboxdUsername;
                 } else {
                     letterboxdUsername.value = '';
                 }
-                
+
                 letterboxdModal.show();
             });
-            
+
             // Save Letterboxd username handler
-            saveLetterboxdBtn.addEventListener('click', function() {
+            saveLetterboxdBtn.addEventListener('click', function () {
                 const username = letterboxdUsername.value.trim();
-                
+
                 if (!username) {
                     alert('Please enter a valid Letterboxd username');
                     return;
                 }
-                
+
                 // Show loading state
                 this.textContent = 'Saving...';
                 this.disabled = true;
-                
+
                 // Save username
                 setLetterboxdUsername(username)
                     .then(response => {
                         // Reset button
                         this.textContent = 'Save';
                         this.disabled = false;
-                        
+
                         // Close modal
                         const letterboxdModal = bootstrap.Modal.getInstance(document.getElementById('letterboxdModal'));
                         letterboxdModal.hide();
@@ -1000,18 +1030,18 @@
                     .catch(error => {
                         console.error('Error saving Letterboxd username:', error);
                         alert('Failed to save Letterboxd username. Please try again.');
-                        
+
                         // Reset button
                         this.textContent = 'Save';
                         this.disabled = false;
                     });
             });
-            
+
             // Toggle chat visibility
-            chatToggle.addEventListener('click', function() {
+            chatToggle.addEventListener('click', function () {
                 const messagesContainer = document.querySelector('.chat-messages');
                 const inputContainer = document.querySelector('.chat-input-container');
-                
+
                 if (messagesContainer.style.display === 'none') {
                     messagesContainer.style.display = 'block';
                     inputContainer.style.display = 'flex';
@@ -1022,58 +1052,58 @@
                     chatToggle.textContent = '+';
                 }
             });
-            
+
             // Chat submit
-            chatSubmit.addEventListener('click', function() {
+            chatSubmit.addEventListener('click', function () {
                 sendChatMessage();
             });
-            
-            chatInput.addEventListener('keydown', function(e) {
+
+            chatInput.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     sendChatMessage();
                 }
             });
-            
+
             // Send chat message
             function sendChatMessage() {
                 const message = chatInput.value.trim();
                 if (message === '') return;
-                
+
                 // Add user message to chat
                 addMessageToChat(message, 'user');
-                
+
                 // Clear input
                 chatInput.value = '';
-                
+
                 // Show typing indicator
                 showTypingIndicator();
-                
+
                 // Get user data for personalization
                 let seenMovies = [];
                 let favorites = [];
-                
+
                 // If user is logged in, get their data
                 const token = localStorage.getItem('token');
                 if (token) {
                     // Get favorites and watchlist if available
                     const userFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
                     const userWatchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
-                    
+
                     // Get movie titles instead of IDs
                     if (movieData.length > 0) {
                         favorites = userFavorites.map(id => {
                             const movie = movieData.find(m => m.id === id);
                             return movie ? `${movie.title} (${movie.year})` : null;
                         }).filter(Boolean);
-                        
+
                         seenMovies = userWatchlist.map(id => {
                             const movie = movieData.find(m => m.id === id);
                             return movie ? `${movie.title} (${movie.year})` : null;
                         }).filter(Boolean);
                     }
                 }
-                
+
                 // Get current recommendation context
                 const context = {
                     movies: getCurrentMovies(),
@@ -1085,14 +1115,14 @@
                         username: currentLetterboxdUsername
                     }
                 };
-                
+
                 // Add message to history
                 chatHistory.push({
                     message: message,
                     type: 'user',
                     timestamp: new Date().toISOString()
                 });
-                
+
                 // Call API
                 fetch(`${API_BASE_URL}/chat`, {
                     method: 'POST',
@@ -1105,40 +1135,40 @@
                         context: context
                     })
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`API request failed with status ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Remove typing indicator
-                    removeTypingIndicator();
-                    
-                    // Add bot message to chat
-                    addMessageToChat(data.response, 'bot');
-                    
-                    // Add to history
-                    chatHistory.push({
-                        message: data.response,
-                        type: 'bot',
-                        timestamp: new Date().toISOString()
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`API request failed with status ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Remove typing indicator
+                        removeTypingIndicator();
+
+                        // Add bot message to chat
+                        addMessageToChat(data.response, 'bot');
+
+                        // Add to history
+                        chatHistory.push({
+                            message: data.response,
+                            type: 'bot',
+                            timestamp: new Date().toISOString()
+                        });
+
+                        // Add suggestions if available
+                        if (data.suggestions && data.suggestions.length > 0) {
+                            addSuggestionsToChat(data.suggestions);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error in chat:', error);
+                        removeTypingIndicator();
+
+                        // Add error message
+                        addMessageToChat('Sorry, I had trouble processing your request. Please try again.', 'bot');
                     });
-                    
-                    // Add suggestions if available
-                    if (data.suggestions && data.suggestions.length > 0) {
-                        addSuggestionsToChat(data.suggestions);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error in chat:', error);
-                    removeTypingIndicator();
-                    
-                    // Add error message
-                    addMessageToChat('Sorry, I had trouble processing your request. Please try again.', 'bot');
-                });
             }
-            
+
             // Show typing indicator
             function showTypingIndicator() {
                 const typingIndicator = document.createElement('div');
@@ -1154,7 +1184,7 @@
                 chatMessages.appendChild(typingIndicator);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-            
+
             // Remove typing indicator
             function removeTypingIndicator() {
                 const typingIndicator = document.getElementById('typingIndicator');
@@ -1162,60 +1192,60 @@
                     typingIndicator.remove();
                 }
             }
-            
+
             // Add message to chat
             function addMessageToChat(message, sender) {
                 const messageElement = document.createElement('div');
                 messageElement.className = `message message-${sender}`;
-                
+
                 // Process message if it's from the bot (format movie titles, etc.)
                 if (sender === 'bot') {
                     // Format movie titles
                     message = formatBotMessage(message);
                 }
-                
+
                 messageElement.innerHTML = `
                     <div class="message-content">${message}</div>
                 `;
-                
+
                 chatMessages.appendChild(messageElement);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-            
+
             // Format bot message with enhanced styling
             function formatBotMessage(message) {
                 // Convert line breaks to HTML breaks
                 message = message.replace(/\n/g, '<br>');
-                
+
                 // Highlight movie titles (basic pattern matching)
-                message = message.replace(/["']([^"']+)["']\s*\((\d{4})\)/g, 
+                message = message.replace(/["']([^"']+)["']\s*\((\d{4})\)/g,
                     '<span class="llm-movie-title">"$1" ($2)</span>');
-                
+
                 return message;
             }
-            
+
             // Add suggestions to chat
             function addSuggestionsToChat(suggestions) {
                 const suggestionsContainer = document.createElement('div');
                 suggestionsContainer.className = 'suggestions-container';
-                
+
                 suggestions.forEach(suggestion => {
                     const suggestionElement = document.createElement('div');
                     suggestionElement.className = 'ai-suggestion';
                     suggestionElement.textContent = suggestion;
-                    
-                    suggestionElement.addEventListener('click', function() {
+
+                    suggestionElement.addEventListener('click', function () {
                         chatInput.value = suggestion;
                         chatInput.focus();
                     });
-                    
+
                     suggestionsContainer.appendChild(suggestionElement);
                 });
-                
+
                 chatMessages.appendChild(suggestionsContainer);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-            
+
             // Get current movies from the form
             function getCurrentMovies() {
                 const movies = [];
@@ -1227,7 +1257,7 @@
                 }
                 return movies;
             }
-            
+
             // Get current filters from the form
             function getCurrentFilters() {
                 return {
@@ -1237,54 +1267,54 @@
                     mood: document.getElementById('moodSelect').value
                 };
             }
-            
+
             // Track number of movie inputs
             let movieCount = 1;
-            
+
             // Movie data for autocomplete
             let movieData = [];
-            
+
             // Fetch movie data for autocomplete
             fetch(`${API_BASE_URL}/movies`)
                 .then(response => response.json())
                 .then(data => {
                     movieData = data;
                     console.log(`Loaded ${movieData.length} movies for autocomplete`);
-                    
+
                     // Format movie data for autocomplete
                     const movieSuggestions = movieData.map(movie => `${movie.title} (${movie.year})`);
-                    
+
                     // Set up autocomplete for first input
                     setupAutocomplete('movieInput1', 'autocomplete-list1', movieSuggestions);
                 })
                 .catch(error => {
                     console.error('Error loading movie data:', error);
-                    
+
                     // Fallback to sample data if API fails
                     const sampleMovies = [
-                        "The Shawshank Redemption (1994)", 
-                        "The Godfather (1972)", 
+                        "The Shawshank Redemption (1994)",
+                        "The Godfather (1972)",
                         "The Dark Knight (2008)",
-                        "Inception (2010)", 
+                        "Inception (2010)",
                         "The Matrix (1999)",
                         "Parasite (2019)",
                         "Interstellar (2014)",
                         "The Lord of the Rings: The Fellowship of the Ring (2001)"
                     ];
-                    
+
                     // Set up autocomplete with sample data
                     setupAutocomplete('movieInput1', 'autocomplete-list1', sampleMovies);
                 });
-            
+
             // Add movie input functionality
-            addMovieBtn.addEventListener('click', function() {
+            addMovieBtn.addEventListener('click', function () {
                 if (movieCount >= 5) {
                     alert('Maximum 5 movies allowed');
                     return;
                 }
-                
+
                 movieCount++;
-                
+
                 const inputRow = document.createElement('div');
                 inputRow.className = 'input-row';
                 inputRow.innerHTML = `
@@ -1296,27 +1326,27 @@
                         <button type="button" class="remove-btn" data-input="${movieCount}">×</button>
                     </div>
                 `;
-                
+
                 additionalInputs.appendChild(inputRow);
-                
+
                 // Set up autocomplete for new input
-                const movieSuggestions = movieData.length > 0 
+                const movieSuggestions = movieData.length > 0
                     ? movieData.map(movie => `${movie.title} (${movie.year})`)
                     : ["The Shawshank Redemption (1994)", "The Godfather (1972)", "The Dark Knight (2008)"];
-                
+
                 setupAutocomplete(`movieInput${movieCount}`, `autocomplete-list${movieCount}`, movieSuggestions);
-                
+
                 // Add remove functionality
-                inputRow.querySelector('.remove-btn').addEventListener('click', function() {
+                inputRow.querySelector('.remove-btn').addEventListener('click', function () {
                     inputRow.remove();
                     movieCount--;
                 });
             });
-            
+
             // Form submission
-            movieForm.addEventListener('submit', function(e) {
+            movieForm.addEventListener('submit', function (e) {
                 e.preventDefault();
-                
+
                 // Get all input values
                 const movieInputs = [];
                 for (let i = 1; i <= 5; i++) {
@@ -1325,19 +1355,19 @@
                         movieInputs.push(input.value.trim());
                     }
                 }
-                
+
                 // Ensure at least one movie is entered
                 if (movieInputs.length === 0) {
                     alert('Please enter at least one movie');
                     return;
                 }
-                
+
                 // Get filter values
                 const genre = document.getElementById('genreSelect').value;
                 const year = document.getElementById('yearSelect').value;
                 const rating = document.getElementById('ratingSelect').value;
                 const mood = document.getElementById('moodSelect').value;
-                
+
                 // Show loading state
                 recommendationsSection.innerHTML = `
                     <div class="loading">
@@ -1346,20 +1376,20 @@
                         <p>Our AI is analyzing your preferences</p>
                     </div>
                 `;
-                
+
                 // Scroll to recommendations
                 recommendationsSection.scrollIntoView({ behavior: 'smooth' });
-                
+
                 // Make API call to backend
                 fetch(`${API_BASE_URL}/recommend`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ 
-                        movies: movieInputs, 
-                        genre: genre, 
-                        year: year, 
+                    body: JSON.stringify({
+                        movies: movieInputs,
+                        genre: genre,
+                        year: year,
                         rating: rating,
                         mood: mood,
                         message: '', // Optional user message
@@ -1367,69 +1397,69 @@
                         letterboxdUsername: currentLetterboxdUsername
                     })
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`API request failed with status ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Store context in chat history
-                    chatHistory.push({
-                        type: 'recommendation',
-                        movies: movieInputs,
-                        filters: { genre, year, rating, mood },
-                        timestamp: new Date().toISOString()
-                    });
-                    
-                    // Update recommendation count for logged in users
-                    if (isLoggedIn()) {
-                        totalRecommendations++;
-                        recommendationsCount.textContent = totalRecommendations;
-                        localStorage.setItem('recommendationsCount', totalRecommendations.toString());
-                    }
-                    
-                    // Process and display recommendations
-                    if (data.conversational && data.enhancedResponse) {
-                        // Display LLM response with enhanced movie data
-                        displayConversationalRecommendations(data.recommendations, data.enhancedResponse, data.usedLetterboxd);
-                    } else {
-                        // Display traditional recommendations
-                        displayRecommendations(parseRecommendations(data.recommendations));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching recommendations:', error);
-                    recommendationsSection.innerHTML = `
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`API request failed with status ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Store context in chat history
+                        chatHistory.push({
+                            type: 'recommendation',
+                            movies: movieInputs,
+                            filters: { genre, year, rating, mood },
+                            timestamp: new Date().toISOString()
+                        });
+
+                        // Update recommendation count for logged in users
+                        if (isLoggedIn()) {
+                            totalRecommendations++;
+                            recommendationsCount.textContent = totalRecommendations;
+                            localStorage.setItem('recommendationsCount', totalRecommendations.toString());
+                        }
+
+                        // Process and display recommendations
+                        if (data.conversational && data.enhancedResponse) {
+                            // Display LLM response with enhanced movie data
+                            displayConversationalRecommendations(data.recommendations, data.enhancedResponse, data.usedLetterboxd);
+                        } else {
+                            // Display traditional recommendations
+                            displayRecommendations(parseRecommendations(data.recommendations));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching recommendations:', error);
+                        recommendationsSection.innerHTML = `
                         <div class="api-error">
                             <h3>Oops! Something went wrong</h3>
                             <p>We couldn't retrieve your recommendations at this time. Please try again later.</p>
                             <p>Error details: ${error.message}</p>
                         </div>
                     `;
-                });
+                    });
             });
-            
+
             // Display conversational recommendations with LLM response
             function displayConversationalRecommendations(llmText, enhancedMovies, usedLetterboxd) {
                 // Create heading with Letterboxd badge if used
-                const letterboxdBadge = usedLetterboxd ? 
+                const letterboxdBadge = usedLetterboxd ?
                     `<span class="badge bg-primary ms-2"><i class="fas fa-film me-1"></i> Including Letterboxd Ratings</span>` : '';
-                
+
                 recommendationsSection.innerHTML = `
                     <h2 class="results-title">Your Recommendations ${letterboxdBadge}</h2>
                     <div class="llm-response">${formatBotMessage(llmText)}</div>
                 `;
-                
+
                 // Add movie cards using enhanced data
                 enhancedMovies.forEach(movie => {
                     const movieCard = document.createElement('div');
                     movieCard.className = 'movie-card';
-                    
+
                     // Check if movie is in favorites/watchlist
                     const inFavorites = isInFavorites(movie.id);
                     const inWatchlist = isInWatchlist(movie.id);
-                    
+
                     // Movie actions HTML (only for logged in users)
                     let movieActionsHtml = '';
                     if (isLoggedIn()) {
@@ -1444,7 +1474,7 @@
                             </div>
                         `;
                     }
-                    
+
                     movieCard.innerHTML = `
                         <img src="${movie.poster}" alt="${movie.title}" class="movie-poster">
                         <div class="movie-info">
@@ -1457,83 +1487,101 @@
                             ${movieActionsHtml}
                         </div>
                     `;
-                    
+
                     recommendationsSection.appendChild(movieCard);
-                    
+
                     // Add event listeners to buttons if user is logged in
                     if (isLoggedIn()) {
                         const favoriteBtn = movieCard.querySelector('.favorite');
                         const watchlistBtn = movieCard.querySelector('.watchlist');
-                        
+
                         // Favorite button action
-                        favoriteBtn.addEventListener('click', function() {
+                        favoriteBtn.addEventListener('click', function () {
                             const movieId = this.getAttribute('data-movie-id');
                             const isFavorite = this.classList.contains('active');
-                            
+
                             if (isFavorite) {
                                 // Remove from favorites
                                 removeFromFavorites(movieId)
                                     .then(response => {
                                         this.classList.remove('active');
                                         this.innerHTML = '<i class="fas fa-heart-o"></i> Add to Favorites';
-                                        
+
                                         // Update favorites count
                                         const currentCount = parseInt(favoritesCount.textContent) - 1;
                                         favoritesCount.textContent = currentCount >= 0 ? currentCount : 0;
-                                        
+
                                         // Update localStorage
                                         updateLocalStorageFavorites(movieId, false);
                                     })
                                     .catch(err => console.error('Error removing from favorites:', err));
                             } else {
                                 // Add to favorites
-                                addToFavorites(movieId)
+                                const movie = {
+                                    id: movieId,
+                                    title: this.closest('.movie-card').querySelector('.movie-title').textContent,
+                                    year: this.closest('.movie-card').querySelector('.movie-title').textContent.match(/\((\d{4})\)/)[1],
+                                    poster: this.closest('.movie-card').querySelector('.movie-poster').src,
+                                    description: this.closest('.movie-card').querySelector('.movie-description').textContent,
+                                    rating: this.closest('.movie-card').querySelector('.movie-meta').textContent.match(/Rating: ([\d.]+)/)[1]
+                                };
+
+                                addToFavorites(movie)
                                     .then(response => {
                                         this.classList.add('active');
                                         this.innerHTML = '<i class="fas fa-heart"></i> Favorited';
-                                        
+
                                         // Update favorites count
                                         const currentCount = parseInt(favoritesCount.textContent) + 1;
                                         favoritesCount.textContent = currentCount;
-                                        
+
                                         // Update localStorage
                                         updateLocalStorageFavorites(movieId, true);
                                     })
                                     .catch(err => console.error('Error adding to favorites:', err));
                             }
                         });
-                        
+
                         // Watchlist button action
-                        watchlistBtn.addEventListener('click', function() {
+                        watchlistBtn.addEventListener('click', function () {
                             const movieId = this.getAttribute('data-movie-id');
                             const isInWatchlist = this.classList.contains('active');
-                            
+
                             if (isInWatchlist) {
                                 // Remove from watchlist
                                 removeFromWatchlist(movieId)
                                     .then(response => {
                                         this.classList.remove('active');
                                         this.innerHTML = '<i class="fas fa-square-o"></i> Add to Watchlist';
-                                        
+
                                         // Update watchlist count
                                         const currentCount = parseInt(watchlistCount.textContent) - 1;
                                         watchlistCount.textContent = currentCount >= 0 ? currentCount : 0;
-                                        
+
                                         // Update localStorage
                                         updateLocalStorageWatchlist(movieId, false);
                                     })
                                     .catch(err => console.error('Error removing from watchlist:', err));
                             } else {
                                 // Add to watchlist
-                                addToWatchlist(movieId)
+                                const movie = {
+                                    id: movieId,
+                                    title: this.closest('.movie-card').querySelector('.movie-title').textContent,
+                                    year: this.closest('.movie-card').querySelector('.movie-title').textContent.match(/\((\d{4})\)/)[1],
+                                    poster: this.closest('.movie-card').querySelector('.movie-poster').src,
+                                    description: this.closest('.movie-card').querySelector('.movie-description').textContent,
+                                    rating: this.closest('.movie-card').querySelector('.movie-meta').textContent.match(/Rating: ([\d.]+)/)[1]
+                                };
+
+                                addToWatchlist(movie)
                                     .then(response => {
                                         this.classList.add('active');
                                         this.innerHTML = '<i class="fas fa-check-square"></i> In Watchlist';
-                                        
+
                                         // Update watchlist count
                                         const currentCount = parseInt(watchlistCount.textContent) + 1;
                                         watchlistCount.textContent = currentCount;
-                                        
+
                                         // Update localStorage
                                         updateLocalStorageWatchlist(movieId, true);
                                     })
@@ -1542,7 +1590,7 @@
                         });
                     }
                 });
-                
+
                 // Add chat prompt
                 const chatPrompt = document.createElement('div');
                 chatPrompt.className = 'feedback-section';
@@ -1550,13 +1598,13 @@
                     <div class="feedback-title">Want to know more about these recommendations?</div>
                     <button class="submit-button" id="askMoreBtn">Ask the AI Assistant</button>
                 `;
-                
+
                 recommendationsSection.appendChild(chatPrompt);
-                
+
                 // Set up ask more button
-                document.getElementById('askMoreBtn').addEventListener('click', function() {
+                document.getElementById('askMoreBtn').addEventListener('click', function () {
                     chatSection.scrollIntoView({ behavior: 'smooth' });
-                    
+
                     // Focus chat input
                     setTimeout(() => {
                         chatInput.focus();
@@ -1564,11 +1612,11 @@
                     }, 500);
                 });
             }
-            
+
             // Update localStorage for favorites
             function updateLocalStorageFavorites(movieId, add) {
                 const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-                
+
                 if (add) {
                     if (!favorites.includes(movieId)) {
                         favorites.push(movieId);
@@ -1579,14 +1627,14 @@
                         favorites.splice(index, 1);
                     }
                 }
-                
+
                 localStorage.setItem('favorites', JSON.stringify(favorites));
             }
-            
+
             // Update localStorage for watchlist
             function updateLocalStorageWatchlist(movieId, add) {
                 const watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
-                
+
                 if (add) {
                     if (!watchlist.includes(movieId)) {
                         watchlist.push(movieId);
@@ -1597,26 +1645,26 @@
                         watchlist.splice(index, 1);
                     }
                 }
-                
+
                 localStorage.setItem('watchlist', JSON.stringify(watchlist));
             }
-            
+
             // Check if movie is in favorites
             function isInFavorites(movieId) {
                 const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
                 return favorites.includes(movieId);
             }
-            
+
             // Check if movie is in watchlist
             function isInWatchlist(movieId) {
                 const watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
                 return watchlist.includes(movieId);
             }
-            
+
             // Load Letterboxd connection status
             function loadLetterboxdStatus() {
                 if (!isLoggedIn()) return;
-                
+
                 // Fetch user profile to get Letterboxd info
                 authFetch(`${API_BASE_URL}/auth/profile`)
                     .then(response => response.json())
@@ -1642,11 +1690,11 @@
                         letterboxdStatus.textContent = 'Failed to load Letterboxd connection status';
                     });
             }
-            
+
             // Set Letterboxd username
             function setLetterboxdUsername(username) {
                 if (!isLoggedIn()) return Promise.reject(new Error('Not logged in'));
-                
+
                 return authFetch(`${API_BASE_URL}/user/letterboxd`, {
                     method: 'POST',
                     headers: {
@@ -1654,32 +1702,32 @@
                     },
                     body: JSON.stringify({ username })
                 })
-                .then(response => response.json())
-                .then(data => {
-                    // Update local state
-                    isLetterboxdConnected = true;
-                    currentLetterboxdUsername = username;
-                    letterboxdStatus.innerHTML = `Connected as <strong>${username}</strong>`;
-                    letterboxdConnectBtn.textContent = 'Edit';
-                    localStorage.setItem('letterboxd_username', username);
-                    return data;
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update local state
+                        isLetterboxdConnected = true;
+                        currentLetterboxdUsername = username;
+                        letterboxdStatus.innerHTML = `Connected as <strong>${username}</strong>`;
+                        letterboxdConnectBtn.textContent = 'Edit';
+                        localStorage.setItem('letterboxd_username', username);
+                        return data;
+                    });
             }
-            
+
             // Parse LLM response text into structured recommendations
             function parseRecommendations(responseText) {
                 // Parse recommendations from LLM text (simplified example)
                 const recommendations = [];
-                
+
                 // Split text into sections for each movie
                 const movieSections = responseText.split(/\d+\.\s+/).filter(Boolean);
-                
+
                 movieSections.forEach(section => {
                     // Extract movie details from text
                     const titleMatch = section.match(/^(.+?)\s*\((\d{4})\)/);
                     const directorMatch = section.match(/Director:\s*([^\n]+)/);
                     const ratingMatch = section.match(/Rating:\s*(\d+(\.\d+)?)/);
-                    
+
                     if (titleMatch) {
                         recommendations.push({
                             title: titleMatch[1].trim(),
@@ -1692,11 +1740,11 @@
                         });
                     }
                 });
-                
+
                 // If parsing fails, return example recommendations
                 return recommendations.length > 0 ? recommendations : getExampleRecommendations();
             }
-            
+
             // Extract description from response text
             function extractDescription(text) {
                 const plotLabels = ['Synopsis:', 'Plot:', 'Summary:'];
@@ -1707,7 +1755,7 @@
                         return text.substring(start, end > 0 ? end : undefined).trim();
                     }
                 }
-                
+
                 // If no explicit plot section, take the first sentence after director
                 const directorEnd = text.indexOf('Director:') + 'Director:'.length;
                 if (directorEnd > 0) {
@@ -1716,10 +1764,10 @@
                         return text.substring(nextParagraph, text.indexOf('\n', nextParagraph + 1)).trim();
                     }
                 }
-                
+
                 return "No plot description available.";
             }
-            
+
             // Extract recommendation reason from response text
             function extractReason(text) {
                 const whyLabels = ['Why you might like it:', 'Why:', 'Recommendation reason:'];
@@ -1729,7 +1777,7 @@
                         return text.substring(start).trim();
                     }
                 }
-                
+
                 // Look for explanatory paragraph
                 if (text.includes('would appeal')) {
                     const appealStart = text.indexOf('would appeal');
@@ -1738,10 +1786,10 @@
                         return text.substring(appealStart - 20, period + 1).trim();
                     }
                 }
-                
+
                 return "Similar themes and storytelling style to your favorite movies.";
             }
-            
+
             // Get movie poster URL (placeholder implementation)
             function getMoviePoster(title) {
                 // In a real implementation, you would use a movie database API
@@ -1752,31 +1800,31 @@
                     'https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg',
                     'https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg'
                 ];
-                
+
                 // Simple hash function to get consistent poster for the same title
                 let hash = 0;
                 for (let i = 0; i < title.length; i++) {
                     hash = ((hash << 5) - hash) + title.charCodeAt(i);
                     hash |= 0; // Convert to 32bit integer
                 }
-                
+
                 // Use the hash to get a consistent poster
                 const index = Math.abs(hash) % fallbackPosters.length;
                 return fallbackPosters[index];
             }
-            
+
             // Display recommendations
             function displayRecommendations(recommendations) {
                 // Create heading
                 recommendationsSection.innerHTML = `
                     <h2 class="results-title">Your Recommendations</h2>
                 `;
-                
+
                 // Create movie cards
                 recommendations.forEach(movie => {
                     const movieCard = document.createElement('div');
                     movieCard.className = 'movie-card';
-                    
+
                     movieCard.innerHTML = `
                         <img src="${movie.poster}" alt="${movie.title}" class="movie-poster">
                         <div class="movie-info">
@@ -1792,10 +1840,10 @@
                             </div>
                         </div>
                     `;
-                    
+
                     recommendationsSection.appendChild(movieCard);
                 });
-                
+
                 // Add feedback section
                 const feedbackSection = document.createElement('div');
                 feedbackSection.className = 'feedback-section';
@@ -1808,30 +1856,30 @@
                         <button class="feedback-btn" data-value="poor">Not Helpful</button>
                     </div>
                 `;
-                
+
                 recommendationsSection.appendChild(feedbackSection);
-                
+
                 // Add feedback button functionality
                 const feedbackButtons = feedbackSection.querySelectorAll('.feedback-btn');
                 feedbackButtons.forEach(button => {
-                    button.addEventListener('click', function() {
+                    button.addEventListener('click', function () {
                         const value = this.getAttribute('data-value');
-                        
+
                         // Remove active class from all buttons
                         feedbackButtons.forEach(btn => {
                             btn.style.backgroundColor = '';
                             btn.style.color = '';
                             btn.style.borderColor = '';
                         });
-                        
+
                         // Highlight selected button
                         this.style.backgroundColor = '#3498db';
                         this.style.color = 'white';
                         this.style.borderColor = '#3498db';
-                        
+
                         // In a real app, send feedback to your backend
                         console.log(`User feedback: ${value}`);
-                        
+
                         // Show thank you message
                         setTimeout(() => {
                             feedbackSection.innerHTML = `
@@ -1840,7 +1888,7 @@
                         }, 500);
                     });
                 });
-                
+
                 // Add chat prompt
                 const chatPrompt = document.createElement('div');
                 chatPrompt.className = 'feedback-section';
@@ -1848,13 +1896,13 @@
                     <div class="feedback-title">Want to know more about these recommendations?</div>
                     <button class="submit-button" id="askMoreBtn">Ask the AI Assistant</button>
                 `;
-                
+
                 recommendationsSection.appendChild(chatPrompt);
-                
+
                 // Set up ask more button
-                document.getElementById('askMoreBtn').addEventListener('click', function() {
+                document.getElementById('askMoreBtn').addEventListener('click', function () {
                     chatSection.scrollIntoView({ behavior: 'smooth' });
-                    
+
                     // Focus chat input
                     setTimeout(() => {
                         chatInput.focus();
@@ -1862,64 +1910,64 @@
                     }, 500);
                 });
             }
-            
+
             // Autocomplete functionality
             function setupAutocomplete(inputId, listId, suggestions) {
                 const input = document.getElementById(inputId);
                 const list = document.getElementById(listId);
-                
-                input.addEventListener('input', function() {
+
+                input.addEventListener('input', function () {
                     const value = this.value.toLowerCase();
                     list.innerHTML = '';
-                    
+
                     if (!value) {
                         list.classList.add('hidden');
                         return;
                     }
-                    
+
                     // Filter matching suggestions
-                    const matches = suggestions.filter(suggestion => 
+                    const matches = suggestions.filter(suggestion =>
                         suggestion.toLowerCase().includes(value)
                     ).slice(0, 6);
-                    
+
                     if (matches.length === 0) {
                         list.classList.add('hidden');
                         return;
                     }
-                    
+
                     // Create suggestion items
                     matches.forEach(match => {
                         const item = document.createElement('div');
                         item.className = 'autocomplete-item';
                         item.textContent = match;
-                        
-                        item.addEventListener('click', function() {
+
+                        item.addEventListener('click', function () {
                             input.value = match;
                             list.classList.add('hidden');
                         });
-                        
+
                         list.appendChild(item);
                     });
-                    
+
                     list.classList.remove('hidden');
                 });
-                
+
                 // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
+                document.addEventListener('click', function (e) {
                     if (e.target !== input) {
                         list.classList.add('hidden');
                     }
                 });
-                
+
                 // Show dropdown when input is focused
-                input.addEventListener('focus', function() {
+                input.addEventListener('focus', function () {
                     if (this.value.trim() !== '') {
                         const event = new Event('input');
                         this.dispatchEvent(event);
                     }
                 });
             }
-            
+
             // Example recommendation function for fallback
             function getExampleRecommendations() {
                 return [
@@ -1955,6 +2003,7 @@
         });
     </script>
     <!-- In your index.html, login.html, etc. -->
-<script src="./auth-frontend.js"></script>
+    <script src="./auth-frontend.js"></script>
 </body>
+
 </html>
